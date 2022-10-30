@@ -3,20 +3,18 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 import User from "../models/User.js";
-const { BadRequestError, UnauthenticatedError } = require("../errors");
+import Error from "../errors/index.js";
 
 export const signin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     if (!email || !password) {
-      res
-        .status(400)
-        .json({ status: "ok", msg: "Please provide email and password" });
+      throw new Error.BadRequest("Please provide email and password");
     }
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
-      return res.status(404).json({ msg: "User does not exist" });
+      throw new Error.Unauthenticated("Invalid Credentials");
     }
 
     const isPasswordCorrect = await bcrypt.compare(
@@ -25,7 +23,7 @@ export const signin = async (req, res) => {
     );
 
     if (!isPasswordCorrect) {
-      res.status(400).json({ status: "ok", msg: "Invalid Credentials" });
+      throw new Error.Unauthenticated("Invalid Credentials");
     }
 
     const token = jwt.sign(
@@ -36,8 +34,7 @@ export const signin = async (req, res) => {
 
     res.status(200).json({ result: existingUser, token });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ msg: "Something went wrong" });
+    throw new Error.InternalServer("Something went wrong");
   }
 };
 
@@ -49,11 +46,11 @@ export const signup = async (req, res) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res.status(400).json({ msg: "User already exists" });
+      throw new Error.BadRequest("User already exists");
     }
 
     if (password !== confirmPassword) {
-      return res.status(400).json({ msg: "Password does not match" });
+      throw new Error.BadRequest("Password does not match");
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -73,7 +70,6 @@ export const signup = async (req, res) => {
 
     res.status(200).json({ result, token });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ msg: "Something went wrong" });
+    throw new Error.InternalServer("Something went wrong");
   }
 };

@@ -3,10 +3,13 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import helmet from "helmet";
 import rateLimiter from "express-rate-limit";
-import mongoose from "mongoose";
 import { connectDB } from "./db/connect.js";
 import dotenv from "dotenv";
 dotenv.config();
+
+//Error imports
+import notFound from "./middleware/not-found.js";
+import errorHandlerMiddleware from "./middleware/error-handler.js";
 
 //Routes
 import userRoutes from "./routes/User.js";
@@ -32,6 +35,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/user", userRoutes);
+
+//Error routes
+app.use(notFound);
+app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 3000;
 
