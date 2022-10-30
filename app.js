@@ -8,6 +8,9 @@ import { connectDB } from "./db/connect.js";
 import dotenv from "dotenv";
 dotenv.config();
 
+//Routes
+import userRoutes from "./routes/User.js";
+
 const app = express();
 
 //Extra packages
@@ -27,6 +30,8 @@ app.use(helmet());
 app.get("/", (req, res) => {
   res.send("Blog Api working perfectly");
 });
+
+app.use("/user", userRoutes);
 
 const port = process.env.PORT || 3000;
 

@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 import User from "../models/User.js";
+const { BadRequestError, UnauthenticatedError } = require("../errors");
 
 export const signin = async (req, res) => {
   const { email, password } = req.body;
