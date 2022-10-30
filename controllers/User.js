@@ -10,11 +10,13 @@ export const signin = async (req, res) => {
 
   try {
     if (!email || !password) {
-      throw new Error.BadRequest("Please provide email and password");
+      throw new Error.BadRequestError("Please provide email and password");
     }
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
-      throw new Error.Unauthenticated("Invalid Credentials");
+      // throw new Error.UnauthenticatedError("Invalid Credentials");
+      res.status(401).json({ msg: "Invalid Credientials" });
+      return;
     }
 
     const isPasswordCorrect = await bcrypt.compare(
@@ -23,7 +25,9 @@ export const signin = async (req, res) => {
     );
 
     if (!isPasswordCorrect) {
-      throw new Error.Unauthenticated("Invalid Credentials");
+      // throw new Error.UnauthenticatedError("Invalid Credentials");
+      res.status(401).json({ msg: "Invalid Credientials" });
+      return;
     }
 
     const token = jwt.sign(
@@ -34,7 +38,8 @@ export const signin = async (req, res) => {
 
     res.status(200).json({ result: existingUser, token });
   } catch (error) {
-    throw new Error.InternalServer("Something went wrong");
+    // throw new Error.InternalServalError("Something went wrong, try again");
+    res.status(500).json({ msg: "Something went wrong, try again" });
   }
 };
 
@@ -42,15 +47,18 @@ export const signup = async (req, res) => {
   const { email, password, confirmPassword, firstName, lastName, phoneNumber } =
     req.body;
 
+  const existingUser = await User.findOne({ email });
   try {
-    const existingUser = await User.findOne({ email });
-
     if (existingUser) {
-      throw new Error.BadRequest("User already exists");
+      // throw new Error.BadRequestError("User already exists");
+      res.status(400).json({ msg: "User already exists" });
+      return;
     }
 
     if (password !== confirmPassword) {
-      throw new Error.BadRequest("Password does not match");
+      // throw new Error.BadRequestError("Password does not match");
+      res.status(400).json({ msg: "Password does not match" });
+      return;
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -70,6 +78,7 @@ export const signup = async (req, res) => {
 
     res.status(200).json({ result, token });
   } catch (error) {
-    throw new Error.InternalServer("Something went wrong");
+    // throw new Error.InternalServalError("Something went wrong, try again");
+    res.status(500).json({ msg: "Something went wrong, try again" });
   }
 };

@@ -1,12 +1,9 @@
 import StatusCodes from "http-status-codes";
-import CustomAPI from "./custom-api.js";
+import CustomAPIError from "./custom-api.js";
 
-class UnauthenticatedError extends CustomAPI {
+export default class UnauthenticatedError extends CustomAPIError {
   constructor(message) {
     super(message);
     this.statusCode = StatusCodes.UNAUTHORIZED;
   }
 }
-
-const Unauthenticated = UnauthenticatedError;
-export default Unauthenticated;

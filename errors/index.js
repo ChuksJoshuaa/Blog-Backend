@@ -1,13 +1,13 @@
-import CustomAPI from "./custom-api.js";
-import Unauthenticated from "./unauthenticated.js";
-import NotFound from "./not-found.js";
-import BadRequest from "./bad-request.js";
-import InternalServer from "./internal-server.js";
+import CustomAPIError from "./custom-api.js";
+import UnauthenticatedError from "./unauthenticated.js";
+import NotFoundError from "./not-found.js";
+import BadRequestError from "./bad-request.js";
+import InternalServalError from "./internal-server.js";
 
 export default {
-  CustomAPI,
-  Unauthenticated,
-  NotFound,
-  BadRequest,
-  InternalServer,
+  CustomAPIError,
+  UnauthenticatedError,
+  NotFoundError,
+  BadRequestError,
+  InternalServalError,
 };

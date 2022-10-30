@@ -16,6 +16,11 @@ import userRoutes from "./routes/User.js";
 
 const app = express();
 
+app.use(bodyParser.json({ limit: "30mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+app.use(cors());
+app.use(helmet());
+
 //Extra packages
 app.set("trust proxy", 1);
 app.use(
@@ -24,12 +29,6 @@ app.use(
     max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
   })
 );
-
-app.use(bodyParser.json({ limit: "30mb", extended: true }));
-app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(cors());
-app.use(helmet());
-
 app.get("/", (req, res) => {
   res.send("Blog Api working perfectly");
 });
