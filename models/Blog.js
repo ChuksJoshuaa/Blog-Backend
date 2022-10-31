@@ -25,7 +25,7 @@ const BlogSchema = new mongoose.Schema(
     },
     reading_time: {
       type: String,
-      default: "5",
+      default: "0",
     },
     tags: [String],
     body: {
