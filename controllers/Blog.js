@@ -32,8 +32,10 @@ export const createBlog = async (req, res) => {
   const { title, description, body } = blog;
 
   try {
-    if (title === "" || description === "" || body === "") {
-      res.status(StatusCodes.BAD_REQUEST).json({ msg: "Incomplete fields" });
+    if (title === "" || description === "" || body === "" || tags === "") {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ msg: "Incomplete fields" });
     } else {
       const newBlog = new Blog({
         ...blog,
@@ -48,11 +50,12 @@ export const createBlog = async (req, res) => {
   }
 };
 
-//Update blog in draft state
-export const updateDraftBlog = async (req, res) => {
+//Update blog in draft state to published state
+export const updateDraftToPublishedBlog = async (req, res) => {
   const { id: _id } = req.params;
   const blog = req.body;
-  const { title, tags, description, body, state } = blog;
+
+  const { state } = blog;
 
   if (!mongoose.Types.ObjectId.isValid(_id)) {
     return res.status(StatusCodes.NOT_FOUND).send(`No blog with id: ${_id}`);
@@ -62,7 +65,7 @@ export const updateDraftBlog = async (req, res) => {
         _id,
         author: req.userId,
       },
-      blog,
+      { ...blog, state },
       {
         new: true,
         runValidators: true,
@@ -74,12 +77,47 @@ export const updateDraftBlog = async (req, res) => {
   }
 };
 
-//Update blog in published state
-export const updatePublishedBlog = async (req, res) => {
+//edit draft
+export const editDraftBlog = async (req, res) => {
   const { id: _id } = req.params;
   const blog = req.body;
   const { title, tags, description, body } = blog;
 
+  if (title === "" || description === "" || body === "" || tags === "") {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ msg: "Incomplete fields" });
+  }
+  if (!mongoose.Types.ObjectId.isValid(_id)) {
+    return res.status(StatusCodes.NOT_FOUND).send(`No blog with id: ${_id}`);
+  } else {
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      {
+        _id,
+        author: req.userId,
+      },
+      { title, tags, description, body },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+      .where("state")
+      .equals("draft");
+    res.status(200).json(updatedBlog);
+  }
+};
+
+//Edit blog in published state
+export const editPublishedBlog = async (req, res) => {
+  const { id: _id } = req.params;
+  const blog = req.body;
+  const { title, tags, description, body } = blog;
+
+  if (title === "" || description === "" || body === "" || tags === "") {
+    res.status(StatusCodes.BAD_REQUEST).json({ msg: "Incomplete fields" });
+    return;
+  }
   if (!mongoose.Types.ObjectId.isValid(_id)) {
     return res.status(StatusCodes.NOT_FOUND).send(`No blog with id: ${_id}`);
   } else {
