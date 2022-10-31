@@ -10,7 +10,9 @@ export const signin = async (req, res) => {
 
   try {
     if (!email || !password) {
-      throw new Error.BadRequestError("Please provide email and password");
+      // throw new Error.BadRequestError("Please provide email and password");
+      res.status(401).json({ msg: "Please provide and password" });
+      return;
     }
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
