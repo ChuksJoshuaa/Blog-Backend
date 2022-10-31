@@ -13,6 +13,7 @@ import errorHandlerMiddleware from "./middleware/error-handler.js";
 
 //Routes
 import userRoutes from "./routes/User.js";
+import blogRoutes from "./routes/Blog.js";
 
 const app = express();
 
@@ -33,7 +34,11 @@ app.get("/", (req, res) => {
   res.send("Blog Api working perfectly");
 });
 
+//Authentication Route
 app.use("/user", userRoutes);
+
+//Blog routes
+app.use("/blog", blogRoutes);
 
 //Error routes
 app.use(notFound);
