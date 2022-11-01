@@ -5,7 +5,7 @@
   "type": "module",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js"
   },
   "author": "",
   "license": "ISC",
@@ -21,10 +21,11 @@
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.2",
+    "nodemon": "^2.0.20",
     "rate-limiter": "^0.2.0",
     "xss-clean": "^0.1.1"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.20"
+  "engines": {
+    "node": "16.x"
   }
 }

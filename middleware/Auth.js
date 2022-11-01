@@ -1,20 +1,18 @@
 import jwt from "jsonwebtoken";
-import Error from "../errors/index.js";
+import dotenv from "dotenv";
+dotenv.config();
 
-const Auth = async (req, res, next) => {
+const auth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer")) {
-      // throw new Error.UnauthenticatedError("Authentication Invalid");
-      res.status(401).json({ msg: "Authentication Invalid" });
-      return;
+      return res.status(401).json({ msg: "Authentication is not correct" });
     }
     const token = authHeader.split(" ")[1];
-    const isCustomAuth = token.length < 500;
 
     let decodedData;
 
-    if (token && isCustomAuth) {
+    if (token) {
       decodedData = jwt.verify(token, process.env.JWT_SECRET);
 
       req.userId = decodedData?.id;
@@ -25,9 +23,9 @@ const Auth = async (req, res, next) => {
 
     next();
   } catch (error) {
-    // throw new Error.UnauthenticatedError("Authentication Invalid");
-    res.status(401).json({ msg: "Authentication Invalid" });
+    console.log(error);
+    return res.status(401).json({ msg: "Authentication Invalid" });
   }
 };
 
-export default Auth;
+export default auth;

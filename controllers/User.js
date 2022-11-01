@@ -1,72 +1,65 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 import dotenv from "dotenv";
 dotenv.config();
-import User from "../models/User.js";
-import Error from "../errors/index.js";
 
 export const signin = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     if (!email || !password) {
-      throw new Error.BadRequestError("Please provide email and password");
-    }
-    const existingUser = await User.findOne({ email });
-    if (!existingUser) {
-      // throw new Error.UnauthenticatedError("Invalid Credentials");
-      res.status(401).json({ msg: "Invalid Credientials" });
-      return;
+      res
+        .status(400)
+        .json({ status: "ok", msg: "Please provide email and password" });
     }
 
-    const isPasswordCorrect = await bcrypt.compare(
-      password,
-      existingUser.password
-    );
+    const oldUser = await User.findOne({ email });
+    if (!oldUser) {
+      return res.status(404).json({ msg: "User does not exist" });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, oldUser.password);
 
     if (!isPasswordCorrect) {
-      // throw new Error.UnauthenticatedError("Invalid Credentials");
-      res.status(401).json({ msg: "Invalid Credientials" });
-      return;
+      res.status(400).json({ msg: "Invalid Credentials" });
     }
-
     const token = jwt.sign(
-      { email: existingUser.email, id: existingUser._id },
+      {
+        email: oldUser.email,
+        password: oldUser.password,
+        id: oldUser._id,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_LIFETIME }
+      {
+        expiresIn: process.env.JWT_LIFETIME,
+      }
     );
-
-    res.status(200).json({ result: existingUser, token });
+    res.status(200).json({ result: oldUser, token });
   } catch (error) {
-    // throw new Error.InternalServalError("Something went wrong, try again");
-    res.status(500).json({ msg: "Something went wrong, try again" });
+    res.status(404).json({ msg: error.msg });
   }
 };
 
 export const signup = async (req, res) => {
-  const { email, password, confirmPassword, firstName, lastName, phoneNumber } =
+  const { email, phoneNumber, firstName, lastName, password, confirmPassword } =
     req.body;
 
-  const existingUser = await User.findOne({ email });
   try {
-    if (existingUser) {
-      // throw new Error.BadRequestError("User already exists");
-      res.status(400).json({ msg: "User already exists" });
-      return;
+    const oldUser = await User.findOne({ email });
+    if (oldUser) {
+      return res.status(404).json({ msg: "User already exist" });
     }
 
     if (password !== confirmPassword) {
-      // throw new Error.BadRequestError("Password does not match");
-      res.status(400).json({ msg: "Password does not match" });
-      return;
+      return res.status(400).json({ msg: "Password does not match" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const result = await User.create({
       email,
-      password: hashedPassword,
       mobile: phoneNumber,
+      password: hashedPassword,
       name: `${firstName} ${lastName}`,
     });
 
@@ -78,7 +71,6 @@ export const signup = async (req, res) => {
 
     res.status(200).json({ result, token });
   } catch (error) {
-    // throw new Error.InternalServalError("Something went wrong, try again");
-    res.status(500).json({ msg: "Something went wrong, try again" });
+    res.status(404).json({ msg: error.msg });
   }
 };
