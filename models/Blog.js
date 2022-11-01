@@ -11,9 +11,7 @@ const BlogSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    author: {
-      type: String,
-    },
+    author: String,
     state: {
       type: String,
       enum: ["draft", "published"],

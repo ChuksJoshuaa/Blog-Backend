@@ -21,7 +21,6 @@ const userSchema = Mongoose.Schema({
     required: [true, "please provide number"],
     maxLength: 50,
     minlength: 3,
-    unique: true,
   },
   password: {
     type: String,

@@ -2,6 +2,9 @@ import Blog from "../models/Blog.js";
 import StatusCodes from "http-status-codes";
 import mongoose from "mongoose";
 import Error from "../errors/index.js";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 //Get all published blogs
 export const getAllPublishedBlogs = async (req, res) => {
@@ -29,9 +32,26 @@ export const getAllDraftBlogs = async (req, res) => {
 export const createBlog = async (req, res) => {
   const blog = req.body;
 
-  const { title, description, body } = blog;
+  const { title, description, body, tags } = blog;
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer")) {
+    return res.status(401).json({ msg: "Authentication is not correct" });
+  }
+  const token = authHeader.split(" ")[1];
+
+  let decodedData = "";
+  if (token !== undefined || token !== null) {
+    decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    decodedData = decodedData?.id;
+  }
 
   try {
+    if (decodedData === undefined || decodedData === null) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ msg: "Invalid User or no user signed in yet" });
+    }
     if (title === "" || description === "" || body === "" || tags === "") {
       return res
         .status(StatusCodes.BAD_REQUEST)
@@ -39,14 +59,16 @@ export const createBlog = async (req, res) => {
     } else {
       const newBlog = new Blog({
         ...blog,
-        author: req.userId,
+        author: decodedData,
         createdAt: new Date().toISOString(),
       });
       await newBlog.save();
       res.status(StatusCodes.CREATED).json({ newBlog });
     }
   } catch (error) {
-    res.status(StatusCodes.CONFLICT).json({ msg: error.msg });
+    res
+      .status(StatusCodes.CONFLICT)
+      .json({ msg: "New blog cannot be created. try again" });
   }
 };
 
@@ -57,14 +79,17 @@ export const updateDraftToPublishedBlog = async (req, res) => {
 
   const { state } = blog;
 
+  if (state === "") {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ msg: "state field is empty." });
+  }
+
   if (!mongoose.Types.ObjectId.isValid(_id)) {
     return res.status(StatusCodes.NOT_FOUND).send(`No blog with id: ${_id}`);
   } else {
     const updatedBlog = await Blog.findByIdAndUpdate(
-      {
-        _id,
-        author: req.userId,
-      },
+      _id,
       { ...blog, state },
       {
         new: true,
@@ -92,10 +117,7 @@ export const editDraftBlog = async (req, res) => {
     return res.status(StatusCodes.NOT_FOUND).send(`No blog with id: ${_id}`);
   } else {
     const updatedBlog = await Blog.findByIdAndUpdate(
-      {
-        _id,
-        author: req.userId,
-      },
+      _id,
       { title, tags, description, body },
       {
         new: true,
@@ -122,10 +144,7 @@ export const editPublishedBlog = async (req, res) => {
     return res.status(StatusCodes.NOT_FOUND).send(`No blog with id: ${_id}`);
   } else {
     const updatedBlog = await Blog.findByIdAndUpdate(
-      {
-        _id,
-        author: req.userId,
-      },
+      _id,
       { title, tags, description, body },
       {
         new: true,
