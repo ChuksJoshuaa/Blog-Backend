@@ -90,8 +90,17 @@ export const createBlog = async (req, res) => {
         .status(StatusCodes.BAD_REQUEST)
         .json({ msg: "Incomplete fields" });
     } else {
+      //Calculating reading time
+      const wpm = 225; //Average adult reading time (words per minute)
+      const myTitle = title.trim().split(/\s+/).length;
+      const myDescription = description.trim().split(/\s+/).length;
+      const words = body.trim().split(/\s+/).length;
+      const total_words = words + myDescription + myTitle;
+      const readingTime = `${Math.ceil(total_words / wpm)} min`;
+
       const newBlog = new Blog({
         ...blog,
+        reading_time: readingTime,
         author: decodedData,
         createdAt: new Date().toISOString(),
       });
@@ -224,7 +233,7 @@ export const deletePublishedBlog = async (req, res) => {
   res.status(StatusCodes.OK).send("Draft blog was deleted Successfully");
 };
 
-//Get specific author blog
+//Get specific author blog and filter by state
 export const getUserBlogs = async (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer")) {
@@ -238,9 +247,10 @@ export const getUserBlogs = async (req, res) => {
     decodedData = decodedData?.id;
   }
 
-  const { page } = req.query;
+  const { page, state } = req.query;
+
   const LIMIT = 20;
-  const startIndex = (Number(page) - 1) * LIMIT; // get the starting index of the page
+  const startIndex = (Number(page) - 1) * LIMIT;
   const total = await Blog.countDocuments({});
 
   try {
@@ -249,15 +259,63 @@ export const getUserBlogs = async (req, res) => {
         .status(StatusCodes.BAD_REQUEST)
         .json({ msg: "Invalid User or no user signed in yet" });
     }
-    const blogData = await Blog.find({ author: decodedData })
+    const blogData = Blog.find({
+      author: decodedData,
+    });
+
+    //We are filtering by state
+    const filterBlogData = await blogData
+      .find({ state })
       .limit(LIMIT)
       .skip(startIndex);
     res.status(StatusCodes.OK).json({
-      data: blogData,
+      data: filterBlogData,
       currentPage: Number(page),
       NumberOfPages: Math.ceil(total / LIMIT),
     });
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ msg: "No available blogs" });
+  }
+};
+
+// Updated read_count of a single blog post when a user clicks on it.
+// Note, I am putting all the users that clicks on a single blog inside
+// an array.so in the frontend, i would get the length of the array to
+// get the read_count of each blog
+
+export const blogReadCount = async (req, res) => {
+  const { id: _id } = req.params;
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer")) {
+    return res.status(401).json({ msg: "Authentication is not correct" });
+  }
+  const token = authHeader.split(" ")[1];
+
+  let decodedData = "";
+  if (token !== undefined || token !== null) {
+    decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    decodedData = decodedData?.id;
+  }
+  if (!decodedData) {
+    return res.status(401).json({ msg: "Invalid authentication" });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(_id)) {
+    return res.status(404).send(`No blog with id: ${_id}`);
+  } else {
+    const blog = await Blog.findById(_id);
+    const index = blog.read_count.findIndex((id) => id === String(decodedData));
+    if (index === -1) {
+      blog.read_count.push(decodedData);
+    } else {
+      blog.read_count = blog.read_count.filter(
+        (id) => id !== String(decodedData)
+      );
+    }
+    const updatedBlog = await Blog.findByIdAndUpdate(_id, blog, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json(updatedBlog);
   }
 };
