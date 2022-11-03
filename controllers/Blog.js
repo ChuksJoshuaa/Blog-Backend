@@ -43,19 +43,24 @@ export const getAllSearchPublishedBlogs = async (req, res) => {
   //query
   const title = new RegExp(searchQuery, "i");
   const author = new RegExp(user, "i");
-  const blogs = await Blog.find({
-    $or: [{ title }, { tags: { $in: tags.split(",") } }, { author }],
-  })
-    .sort({ read_count: -1, reading_time: -1, timestamp: -1 })
-    .limit(LIMIT)
-    .skip(startIndex)
-    .where("state")
-    .equals("published");
-  res.status(200).json({
-    data: blogs,
-    currentPage: Number(page),
-    NumberOfPages: Math.ceil(total / LIMIT),
-  });
+  
+  try {
+    const blogs = await Blog.find({
+      $or: [{ title }, { tags: { $in: tags.split(",") } }, { author }],
+    })
+      .sort({ read_count: -1, reading_time: -1, timestamp: -1 })
+      .limit(LIMIT)
+      .skip(startIndex)
+      .where("state")
+      .equals("published");
+    res.status(200).json({
+      data: blogs,
+      currentPage: Number(page),
+      NumberOfPages: Math.ceil(total / LIMIT),
+    });
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json({ msg: "No published blog matches the above search query" });
+  }
 };
 
 //get single publish blog
