@@ -1,5 +1,7 @@
 # Blog Api
 
+<img src="https://res.cloudinary.com/chuksmbanaso/image/upload/v1667443228/media/Screenshot_284_v97rqt.png" title="icon" alt="icon">
+
 #### Setup
 
 ```bash
