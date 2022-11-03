@@ -243,7 +243,7 @@ export const deletePublishedBlog = async (req, res) => {
   } else {
     await Blog.findByIdAndDelete(_id).where("state").equals("published");
   }
-  res.status(StatusCodes.OK).send("Draft blog was deleted Successfully");
+  res.status(StatusCodes.OK).send("Published blog was deleted Successfully");
 };
 
 //Get specific author blog and filter by state
