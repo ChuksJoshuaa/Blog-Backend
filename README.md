@@ -94,11 +94,14 @@ Email Validation Regex
 
 - Route: /user/login
 - Method: POST
-- Body:
-  {
-  "email": "john123@gmail.com",
-  "password": "john123"
-  }
+- Body
+
+```
+ {
+ "email": "john123@gmail.com",
+ "password": "john123"
+ }
+```
 
 - Responses
 - Response Status: 200 OK
@@ -124,7 +127,9 @@ Success
 
 - Route: /user/register
 - Method: POST
-- Body:
+- Body
+
+  ```
   {
   "email": "kemi123@gmail.com",
   "firstName": "kemi",
@@ -133,6 +138,7 @@ Success
   "password": "kemi123",
   "confirmPassword": "kemi123"
   }
+  ```
 
 - Responses
 - Response Status: 200 OK
@@ -158,13 +164,16 @@ Success
 
 - Route: /blog/create
 - Method: POST
-- Body:
+- Body
+
+  ```
   {
   "title": "Is tesla the best car",
   "description": "Is this the best car?",
   "body": "Tesla, Inc. (/ˈtɛslə/ TESS-lə or /ˈtɛzlə/ TEZ-lə[b]) is an American automotive and clean energy company based in Austin, Texas. Tesla designs and manufactures electric vehicles (electric cars and trucks), battery energy storage from home to grid-scale, solar panels and solar roof tiles, and related products and services. Tesla is one of the world's most valuable companies and remains the world's most valuable automaker with a market capitalization of more than US $1 trillion. The company had the most worldwide sales of battery electric vehicles and plug-in electric vehicles, capturing 23% of the battery-electric (purely electric) market and 16% of the plug-in market (which includes plug-in hybrids) in 2020. Through its subsidiary Tesla Energy, the company develops and is a major installer of photovoltaic systems in the United States. Tesla Energy is also one of the largest global suppliers of battery energy storage systems, with 3.99 gigawatt-hours (GWh) installed in 2021.",
   "tags": ["Cars", "tesla"]
   }
+  ```
 
 - Responses
 - Response Status: 200 OK
@@ -240,8 +249,11 @@ Success
 - Route: /blog/draft_to_publish/update/:id
 - Method: PATCH
 
-- Body:
+- Body
+
+  ```
   {"state":"published"}
+  ```
 
 - Responses
 - Response Status: 200 OK
@@ -277,13 +289,16 @@ Success
 - Route: /blog/edit/published/:id
 - Method: PATCH
 
-- Body:
-  {
+- Body
+
+```
+ {
   "title": "Ronaldo",
   "description": "Who Is Better Messi Or Ronaldo All Time?",
   "body": "Who has scored the most goals between Messi and Ronaldo? Ronaldo has scored 804 goals in 1106 games while Messi has scored 759 goals in 957 games. Ronaldo has played 149 games more than Messi in his entire career",
   "tags": "Soccer"
   }
+```
 
 - Responses
 - Response Status: 200 OK
@@ -318,13 +333,16 @@ Success
 - Route: /blog/edit/draft/:id
 - Method: PATCH
 
-- Body:
-  {
-  "title": "Vacation Island",
-  "description": "Island Vacation Holiday",
-  "body": "I am taking my family to the island to have fun and spend some quality time with them and also make time for my wife and kids",
-  "tags": ["Vacation"],
-  }
+- Body
+
+```
+{
+ "title": "Vacation Island",
+ "description": "Island Vacation Holiday",
+ "body": "I am taking my family to the island to have fun and spend some quality time with them and also make time for my wife and kids",
+ "tags": ["Vacation"],
+ }
+```
 
 - Responses
 
