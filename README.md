@@ -181,7 +181,7 @@ Success
 Success
 
 ```
-{
+
   {
     "newBlog": {
         "state": "draft",
@@ -201,7 +201,7 @@ Success
         "__v": 0
     }
 }
-}
+
 
 ```
 
