@@ -369,7 +369,7 @@ Success
 
 ```
 
-### Get specific paginated Author blog and filter by state 
+### Get all paginated blogs made by a single user and filter by state
 
 - Route: /blog/all_user_blogs?page=1&state=draft
 - Method: GET
