@@ -99,6 +99,7 @@ Email Validation Regex
   }
 
 - Responses
+- Response Status: 200 OK
 
 Success
 
@@ -132,6 +133,7 @@ Success
   }
 
 - Responses
+- Response Status: 200 OK
 
 Success
 
@@ -163,6 +165,7 @@ Success
   }
 
 - Responses
+- Response Status: 200 OK
 
 Success
 
@@ -197,6 +200,7 @@ Success
 - Method: GET
 
 - Responses
+- Response Status: 200 OK
 
 Success
 
@@ -238,6 +242,7 @@ Success
   {"state":"published"}
 
 - Responses
+- Response Status: 200 OK
 
 Success
 
@@ -279,6 +284,7 @@ Success
   }
 
 - Responses
+- Response Status: 200 OK
 
 Success
 
@@ -349,6 +355,7 @@ Success
 - Method: GET
 
 - Responses
+- Response Status: 200 OK
 
 Success
 
@@ -386,6 +393,7 @@ Success
 - Method: GET
 
 - Responses
+- Response Status: 200 OK
 
 Success
 
@@ -443,5 +451,42 @@ Success
 ```
 
 draft blog has been deleted successfully
+
+```
+
+### Get all searchable published blog that can be accessed by both logged in and logged out users
+
+- Route: /blog/search?searchQuery=Software&tags=none&user=none
+- Method: GET
+
+- Responses
+- Response Status: 200 OK
+
+Success
+
+```
+
+{
+    "data": [
+        {
+            "state": "published",
+            "read_count": [],
+            "reading_time": "0",
+            "tags": [
+                "Developer"
+            ],
+            "_id": "63610b1ed84bea399473e02b",
+            "title": "Software",
+            "description": "Software developers design, program, build, deploy and maintain software using many different skills and tools",
+            "body": "Software developers design specific computer systems and application software. Software engineers work on a larger scale to design, develop, and test entire computer systems and application software for a company or organization—software development is a subset of software engineering",
+            "author": "6360e0bb9b4f1d36e4ae80af",
+            "createdAt": "2022-11-01T12:03:42.721Z",
+            "updatedAt": "2022-11-01T12:05:24.628Z",
+            "__v": 0
+        }
+    ],
+    "currentPage": null,
+    "NumberOfPages": 1
+}
 
 ```
