@@ -490,3 +490,38 @@ Success
 }
 
 ```
+
+### Update blog read_count
+
+- Route: /blog/read_count/:id
+- Method: PATCH
+
+- Responses
+- Response Status: 200 OK
+
+Success
+
+```
+
+{
+    "state": "published",
+    "read_count": [
+        "6360e864c23c624b58637783",
+        "6360e0bb9b4f1d36e4ae80af",
+        "6368a17350f6c80008a96454"
+    ],
+    "reading_time": "1 min",
+    "tags": [
+        "Vacation"
+    ],
+    "_id": "636214a53c361b34e8046762",
+    "title": "Vacation",
+    "description": "Island Vacation",
+    "body": "I am taking my family to the island to have fun and spend some quality time with them and also make time for my wife and kids",
+    "author": "6360e864c23c624b58637783",
+    "createdAt": "2022-11-02T06:56:37.034Z",
+    "updatedAt": "2022-11-07T06:50:46.310Z",
+    "__v": 0
+}
+
+```
