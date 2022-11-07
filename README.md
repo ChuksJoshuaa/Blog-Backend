@@ -353,7 +353,7 @@ Success
 {
     "state": "draft",
     "read_count": [],
-    "reading_time": "1min",
+    "reading_time": "1 min",
     "tags": [
         "Vacation"
     ],
