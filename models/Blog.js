@@ -4,7 +4,7 @@ const BlogSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      require: [true, "Please provide title"],
+      required: [true, "Please provide title"],
       maxlength: 100,
       unique: true,
     },
@@ -28,7 +28,7 @@ const BlogSchema = new mongoose.Schema(
     tags: [String],
     body: {
       type: String,
-      require: [true, "Please provide content body"],
+      required: [true, "Please provide content body"],
     },
   },
   { timestamps: true }
