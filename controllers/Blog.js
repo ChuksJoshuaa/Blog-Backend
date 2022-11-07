@@ -9,6 +9,8 @@ dotenv.config();
 //Get all published blogs that can be accessed by both logged in and logged out users
 export const getAllPublishedBlogs = async (req, res) => {
   const { page } = req.query;
+
+  //Pagination
   const LIMIT = 20;
   const startIndex = (Number(page) - 1) * LIMIT;
   const total = await Blog.countDocuments({});
@@ -31,18 +33,34 @@ export const getAllPublishedBlogs = async (req, res) => {
 
 //Get all searchable published blog that can be accessed by both logged in and logged out users
 export const getAllSearchPublishedBlogs = async (req, res) => {
-  const { searchQuery, tags, user } = req.query;
+  const { page, searchQuery, tags, user } = req.query;
 
+  //Pagination
+  const LIMIT = 20;
+  const startIndex = (Number(page) - 1) * LIMIT;
+  const total = await Blog.countDocuments({});
+
+  //query
   const title = new RegExp(searchQuery, "i");
   const author = new RegExp(user, "i");
-  const blogs = await Blog.find({
-    $or: [{ title }, { tags: { $in: tags.split(",") } }, { author }],
-  })
-    .where("state")
-    .equals("published");
-  res.status(200).json({
-    data: blogs,
-  });
+  
+  try {
+    const blogs = await Blog.find({
+      $or: [{ title }, { tags: { $in: tags.split(",") } }, { author }],
+    })
+      .sort({ read_count: -1, reading_time: -1, timestamp: -1 })
+      .limit(LIMIT)
+      .skip(startIndex)
+      .where("state")
+      .equals("published");
+    res.status(200).json({
+      data: blogs,
+      currentPage: Number(page),
+      NumberOfPages: Math.ceil(total / LIMIT),
+    });
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json({ msg: "No published blog matches the above search query" });
+  }
 };
 
 //get single publish blog
@@ -230,7 +248,7 @@ export const deletePublishedBlog = async (req, res) => {
   } else {
     await Blog.findByIdAndDelete(_id).where("state").equals("published");
   }
-  res.status(StatusCodes.OK).send("Draft blog was deleted Successfully");
+  res.status(StatusCodes.OK).send("Published blog was deleted Successfully");
 };
 
 //Get specific author blog and filter by state
@@ -258,6 +276,17 @@ export const getUserBlogs = async (req, res) => {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ msg: "Invalid User or no user signed in yet" });
+    }
+
+    if (!req.query.state) {
+      const blogData = await Blog.find({
+        author: decodedData,
+      });
+      return res.status(StatusCodes.OK).json({
+        data: blogData,
+        currentPage: Number(page),
+        NumberOfPages: Math.ceil(total / LIMIT),
+      });
     }
     const blogData = Blog.find({
       author: decodedData,
@@ -312,6 +341,7 @@ export const blogReadCount = async (req, res) => {
         (id) => id !== String(decodedData)
       );
     }
+
     const updatedBlog = await Blog.findByIdAndUpdate(_id, blog, {
       new: true,
       runValidators: true,
